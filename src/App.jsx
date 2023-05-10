@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Auth } from "./components/auth";
-import { db } from "./config/firebase";
+import { db, auth, storage } from "./config/firebase";
 import {
   collection,
   getDocs,
@@ -9,6 +9,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import { ref, uploadBytes } from "firebase/storage"
 import "./App.css";
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         title: newMovieTitle,
         releaseDate: newReleaseDate,
         receivedAnOscar: isNewMovieOscar,
+        userID: auth?.currentUser?.uid,
       });
 
       getMovieList();
@@ -60,7 +62,7 @@ function App() {
 
   const deleteMovie = async (id) => {
     const movieDoc = doc(db, "movies", id);
-    await deleteDoc(doc(db, "movies", id));
+    await deleteDoc(movieDoc);
   };
 
   const updateMovieTitle = async (id) => {
@@ -126,6 +128,11 @@ function App() {
             <button onClick={() => deleteMovie(movie.id)}>Delete Movie</button>
           </div>
         ))}
+      </div>
+
+      <div>
+        <input type="file" onChange={(e) => setFileUpload(e.target.files[0])} />
+        <button onClick={uploadFile}>Upload file</button>
       </div>
     </div>
   );
